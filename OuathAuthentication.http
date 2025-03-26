@@ -1,0 +1,6 @@
+@OuathAuthentication_HostAddress = http://localhost:5217
+
+GET {{OuathAuthentication_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
