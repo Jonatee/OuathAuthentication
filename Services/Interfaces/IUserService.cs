@@ -6,5 +6,7 @@ namespace OuathAuthentication.Services.Interfaces
     {
         Task<UserResponseModel> RegisterUser(UserRequestModel request);
         Task<UserResponseModel> LoginUser(LoginRequestModel request);
+        Task<IEnumerable<UserResponseModel>> GetUsers();
+        Task<UserResponseModel> GetUser(string email);
     }
 }

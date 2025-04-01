@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using OuathAuthentication.Entities;
 using OuathAuthentication.Models;
 using OuathAuthentication.Repositories.Interfaces;
@@ -26,6 +27,48 @@ namespace OuathAuthentication.Services.Implementations
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
         }
+
+        public async Task<UserResponseModel> GetUser(string email)
+        {
+            var user = await _userRepository.GetUser(email);
+            if (user == null)
+            {
+                return null;
+            }
+            var response = new UserResponseModel
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                LastLoginAt = user.LastLoginAt,
+                TimesOfLogin = user.TimesOfLogin
+            };
+            return response;
+        }
+
+        public async Task<IEnumerable<UserResponseModel>> GetUsers()
+        {
+            var users = await _userRepository.GetAllUsers();
+
+            if (users == null || !users.Any())
+            {
+                return new List<UserResponseModel>();
+            }
+
+            var response = users.Select(user => new UserResponseModel
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                LastLoginAt = user.LastLoginAt,
+                TimesOfLogin = user.TimesOfLogin
+            }).ToList();
+
+            return response;
+        }
+
         public async Task<UserResponseModel> LoginUser(LoginRequestModel request)
         {
             var userExists = await _userRepository.CheckIfUserExist(request.Email);
@@ -70,9 +113,10 @@ namespace OuathAuthentication.Services.Implementations
                 LastName = getUser.LastName,
                 Role = getUser.Role,
                 LastLoginAt = getUser.LastLoginAt,
-                TimesOfLogin = getUser.TimesOfLogin++,
+                TimesOfLogin = ++getUser.TimesOfLogin,
                 Token = new JwtSecurityTokenHandler().WriteToken(token) 
             };
+            _userRepository.SaveChanges();
 
             return userResponse;
         }
@@ -94,7 +138,8 @@ namespace OuathAuthentication.Services.Implementations
                 LastName = request.LastName,
                 Email = request.Email,
                 Password = hashedPassword,
-                Role = "User"
+                Role = "User",
+                
             };
 
             var createdUser = await _userRepository.AddAsync(newUser);

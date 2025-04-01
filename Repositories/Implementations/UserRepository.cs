@@ -27,12 +27,18 @@ namespace OuathAuthentication.Repositories.Implementations
 
         public async Task<IEnumerable<User>> GetAllUsers()
         {
-            return await _authContext.Users.ToListAsync();
+            return await _authContext.Users.OrderBy(u => u.LastName).ToListAsync();
         }
+
 
         public async Task<User?> GetUser(string email)
         {
             return await _authContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+        }
+
+        public void SaveChanges()
+        {
+            _authContext.SaveChanges();
         }
     }
 }
