@@ -7,6 +7,7 @@
         public string LastName { get;set; } = default!;
         public string Email { get; set; } = default!;
         public string Password { get; set; } = default!;
+        public string Role { get; set; } = "User";
         public int TimesOfLogin { get; set; }
         public DateTime LastLoginAt { get; set; }
 
